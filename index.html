@@ -1,686 +1,93 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>منصة GeoNera - متطورة</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="منصة GeoNest – بيانات وأدوات نظم المعلومات الجغرافية GIS باللغة العربية" />
-  <meta name="keywords" content="GIS, نظم المعلومات الجغرافية, بيانات مكانية, خرائط, تحميل GIS" />
-
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-
+  <title>منصة Geonera - نظم المعلومات الجغرافية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      height: 100%;
-      font-size: 14px;
-      font-family: 'Cairo', sans-serif;
+    body {
       margin: 0;
-      background: #f0f2f5;
+      font-family: 'Cairo', sans-serif;
+      background-color: #f4f8fb;
       color: #222;
-      direction: rtl;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      transition: background-color 0.3s, color 0.3s;
     }
-    .dark-mode {
-      background: #121212;
-      color: #eee;
+    header {
+      background: #0077b6;
+      color: white;
+      padding: 2rem;
+      text-align: center;
     }
-    .sidebar {
-      width: 220px;
-      background: #1a2634;
-      color: #fff;
-      padding: 15px 10px;
-      height: 100vh;
-      position: fixed;
-      right: 0;
-      top: 0;
-      overflow-y: auto;
-      box-shadow: -4px 0 10px rgba(0,0,0,0.3);
-      transition: transform 0.4s ease;
-      z-index: 1000;
-      border-radius: 0 0 0 10px;
-      font-size: 14px;
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
     }
-    .sidebar.hide {
-      transform: translateX(100%);
+    header p {
+      margin-top: 1rem;
+      font-size: 1.2rem;
     }
-    .sidebar h3 {
-      margin-bottom: 20px;
-      font-size: 20px;
-      font-weight: 700;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 8px;
-      letter-spacing: 1px;
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
     }
-    .sidebar a {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #fff;
-      padding: 10px 8px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background-color 0.3s, color 0.3s;
-      text-decoration: none;
-    }
-    .sidebar a:hover, .sidebar a.active {
-      background-color: #3498db;
-      color: #fff;
-      box-shadow: 0 3px 12px rgba(52,152,219,0.4);
-    }
-    .sidebar a i, .sidebar a svg {
-      font-size: 16px !important;
-      vertical-align: middle;
-    }
-    .sidebar-toggle, .dark-toggle {
-      position: fixed;
-      top: 15px;
-      padding: 8px 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      z-index: 1100;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-      user-select: none;
-      transition: background-color 0.3s;
-    }
-    .sidebar-toggle {
-      right: 15px;
-      background: #3498db;
-      color: #fff;
-    }
-    .sidebar-toggle:hover {
-      background: #2980b9;
-    }
-    .dark-toggle {
-      right: 80px;
-      background: #555;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .dark-toggle:hover {
-      background: #444;
-    }
-    .main-container {
-      flex: 1;
-      margin-right: 220px;
-      padding: 20px 25px;
-      min-height: calc(100vh - 60px);
-      background: #fff;
-      border-radius: 10px 0 0 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.07);
-      overflow-y: auto;
-      max-width: 1100px;
-      margin-left: auto;
-    }
-    .full-width {
-      margin-right: 0 !important;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #2c3e50;
-      color: #fff;
-      padding: 15px 25px;
-      border-radius: 10px 0 0 0;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    }
-    .header img {
-      height: 40px;
-      filter: drop-shadow(0 0 3px rgba(0,0,0,0.3));
-      border-radius: 6px;
-      transition: transform 0.3s;
-    }
-    .header img:hover {
-      transform: scale(1.1);
-    }
-    .brand-name {
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      text-shadow: 0 0 6px #3498db;
-    }
-    h2 {
-      background: #3498db;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 10px;
-      margin-top: 30px;
-      font-weight: 700;
-      font-size: 22px;
-      box-shadow: 0 5px 15px rgba(52,152,219,0.5);
-      letter-spacing: 1px;
-      user-select: none;
-    }
-    .panel {
-      background: #f9fbff;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 30px;
-      border: 1px solid #d0d7de;
-      box-shadow: 0 6px 20px rgba(52,152,219,0.1);
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
-    .dark-mode .panel {
-      background: #1e1e2f;
-      border-color: #444;
-      box-shadow: 0 6px 20px rgba(52,152,219,0.3);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 5px 18px rgba(0,0,0,0.06);
-      margin-top: 15px;
-    }
-    th, td {
-      padding: 10px 14px;
-      border: none;
-      text-align: right;
-      background: #fff;
-      transition: background-color 0.3s;
-      user-select: none;
-    }
-    th {
-      background: #3498db;
-      color: #fff;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      font-size: 15px;
-    }
-    tr:nth-child(even) td {
-      background: #f0f4f8;
-    }
-    .dark-mode th {
-      background: #2980b9;
-    }
-    .dark-mode td {
-      background: #2a2a3d;
-      color: #ddd;
-    }
-    .dark-mode tr:nth-child(even) td {
-      background: #242436;
-    }
-    .btn {
-      padding: 8px 20px;
+    .feature {
+      background: white;
       border-radius: 12px;
-      color: #fff;
+      padding: 1.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .feature h3 {
+      color: #0077b6;
+      margin-top: 0;
+    }
+    .cta {
+      text-align: center;
+      margin: 2rem;
+    }
+    .cta a {
+      background: #0077b6;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
       text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      transition: background-color 0.3s, box-shadow 0.3s;
-      display: inline-block;
-      user-select: none;
+      font-size: 1.2rem;
+      transition: background 0.3s;
     }
-    .btn.download {
-      background: #007bff;
-    }
-    .btn.download:hover {
-      background: #0056b3;
-      box-shadow: 0 6px 18px rgba(0,86,179,0.5);
-    }
-    .btn.info {
-      background: #28a745;
-    }
-    .btn.info:hover {
-      background: #1e7e34;
-      box-shadow: 0 6px 18px rgba(30,126,52,0.5);
+    .cta a:hover {
+      background: #005f8d;
     }
     footer {
       text-align: center;
-      padding: 15px;
-      background: #2c3e50;
-      color: #fff;
-      font-size: 14px;
-      border-radius: 0 0 10px 10px;
-      box-shadow: 0 -6px 18px rgba(0,0,0,0.12);
-      user-select: none;
-      margin-top: 30px;
-    }
-    footer a {
-      color: #1abc9c;
-      text-decoration: none;
-      margin: 0 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-      transition: color 0.3s;
-    }
-    footer a:hover {
-      color: #16a085;
-    }
-    form input, form textarea {
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 14px;
-      padding: 10px 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      transition: border-color 0.3s;
-      font-family: 'Cairo', sans-serif;
-      user-select: text;
-    }
-    form input:focus, form textarea:focus {
-      border-color: #3498db;
-      outline: none;
-      box-shadow: 0 0 12px rgba(52,152,219,0.5);
-    }
-    form button {
-      background: #3498db;
-      color: #fff;
-      padding: 12px 28px;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 700;
-      transition: background-color 0.3s, box-shadow 0.3s;
-      user-select: none;
-    }
-    form button:hover {
-      background: #2980b9;
-      box-shadow: 0 8px 24px rgba(41,128,185,0.5);
-    }
-    #map {
-      height: 400px;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-      margin-top: 30px;
-      border: 1px solid #ccc;
-      transition: box-shadow 0.3s;
-    }
-    #map:hover {
-      box-shadow: 0 12px 35px rgba(0,0,0,0.15);
-    }
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr); /* عرض عمودين فقط */
-      gap: 16px;
-      margin-top: 20px;
-    }
-    .gallery-grid img {
-      width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s;
-      cursor: pointer;
-      background: #fff;
-    }
-    .gallery-grid img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    }
-    @media (max-width: 900px) {
-      .sidebar {
-        width: 180px;
-      }
-      .main-container {
-        margin-right: 180px;
-        padding: 15px 20px;
-      }
-    }
-    @media (max-width: 600px) {
-      .sidebar {
-        position: fixed;
-        width: 100%;
-        height: auto;
-        bottom: 0;
-        top: auto;
-        border-radius: 12px 12px 0 0;
-        transform: translateY(0);
-        display: flex;
-        justify-content: space-around;
-        padding: 10px 0;
-        overflow: visible;
-      }
-      .sidebar.hide {
-        transform: translateY(100%);
-      }
-      .sidebar a {
-        border: none;
-        padding: 10px 6px;
-        font-size: 12px;
-      }
-      .main-container {
-        margin: 0;
-        padding: 15px 10px 80px 10px;
-        border-radius: 0;
-      }
-      .header {
-        flex-direction: column;
-        gap: 12px;
-      }
+      padding: 1rem;
+      background: #e3e3e3;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-
-  <div class="sidebar" id="sidebar" aria-label="القائمة الجانبية">
-    <h3>القائمة</h3>
-    <a onclick="actionAndHide(showSections)" tabindex="0" role="button" aria-pressed="false">🗺 بيانات & برامج GIS</a>
-    <a onclick="actionAndHide(showTutorials)" tabindex="0" role="button" aria-pressed="false">📚 شروحات نظم معلومات جغرافية</a>
-    <a onclick="actionAndHide(showPdfTutorials)" tabindex="0" role="button" aria-pressed="false">📄 شروحات PDF</a>
-    <a onclick="actionAndHide(showGallery)" tabindex="0" role="button" aria-pressed="false">🖼️ معرض خرائط وصور GIS</a>
-  </div>
-
-  <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="تبديل القائمة الجانبية">☰ القائمة</button>
-  <button class="dark-toggle" onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي"><span id="modeIcon">🌙</span> الوضع الليلي</button>
-
-  <main class="main-container" id="main" role="main">
-    <header class="header">
-      <img src="https://i.ibb.co/QjH2Xxw9/file-00000000e79861f48fa8dd119ddb7740.png" alt="شعار GeoNera" />
-      <div class="brand-name">منصة GeoNera</div>
-      <img src="https://i.ibb.co/QFCKwR4x/m.png" alt="شعار جهة أخرى" />
-    </header>
-
-    <section id="content" style="display:none;"></section>
-
-    <section id="page-privacy" class="panel" style="display:none;" tabindex="0">
-      <h2>سياسة الخصوصية</h2>
-      <p>نحترم خصوصيتك ولا نجمع بيانات شخصية بدون موافقتك.</p>
-    </section>
-
-    <section id="page-contact" class="panel" style="display:none;" tabindex="0">
-      <h2>اتصل بنا</h2>
-      <p style="font-size:16px;font-weight:700;margin-bottom:12px;">
-        يمكنك التواصل معنا عبر الأرقام التالية:
-      </p>
-      <ul style="font-size:16px; font-weight:700; list-style:none; padding:0; margin-bottom:20px;">
-        <li>📞 ساناتي: <span dir="ltr" style="font-family:monospace;">01032042160</span></li>
-        <li>📞 <span dir="ltr" style="font-family:monospace;">01274053194</span></li>
-      </ul>
-      <form>
-        <input type="text" placeholder="الاسم الكامل" required aria-label="الاسم الكامل" />
-        <input type="email" placeholder="البريد الإلكتروني" required aria-label="البريد الإلكتروني" />
-        <textarea rows="4" placeholder="رسالتك" aria-label="رسالتك"></textarea>
-        <button type="submit" aria-label="إرسال">إرسال</button>
-      </form>
-    </section>
-
-    <section id="page-about" class="panel" style="display:none;" tabindex="0">
-      <h2>من نحن</h2>
-      <p>GeoNera منصة عربية تشمل بيانات وأدوات GIS بروابط تحميل وشروحات فيديو.</p>
-    </section>
-
-    <div id="map" aria-label="خريطة تفاعلية"></div>
-
-    <footer>
-      &copy; 2025 منصة GeoNera •
-      <a onclick="showPage('privacy')" tabindex="0" role="button" aria-pressed="false">سياسة الخصوصية</a> •
-      <a onclick="showPage('contact')" tabindex="0" role="button" aria-pressed="false">اتصل بنا</a> •
-      <a onclick="showPage('about')" tabindex="0" role="button" aria-pressed="false">من نحن</a>
-    </footer>
-  </main>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
-  <script>
-    const data = [
-      {
-        title: "🌍 مواقع تحميل بيانات GIS",
-        rows: [
-          { name: "Earth Explorer (USGS)", use: "تنزيل مرئيات فضائية وDEM", url: "https://earthexplorer.usgs.gov/", info: "https://youtu.be/s6u7dNVnxgU?si=96SFH3uJkuZ2vnJD" },
-          { name: "bbbike", use: "تنزيل بيانات فيكتور – طرق ومدن", url: "https://extract.bbbike.org/", info: "" },
-          { name: "OpenStreetMap", use: "بيانات فيكتور: طرق، مباني", url: "https://www.openstreetmap.org/", info: "https://youtu.be/ddaqpW_ae3M?si=1cvNcFAmFqLOH4ta" },
-          { name: "NASA POWER", use: "بيانات مناخية: حرارة، رطوبة، أمطار، رياح", url: "https://power.larc.nasa.gov/data-access-viewer/", info: "https://youtu.be/FlbnBWhAN8o" },
-          { name: "Open Topography", use: "تحميل بيانات LIDAR ونماذج ارتفاع", url: "https://portal.opentopography.org/datasets", info: "https://youtu.be/ssxQ_WyQmc4?si=Hp6wt5SAjrnA2igQ" },
-          { name: "Diva GIS", use: "بيانات مكانية لأي بلد", url: "https://www.diva-gis.org/Data", info: "https://youtu.be/lvEoAXdyago?si=67JzgWS-2wrBFkzf" },
-          { name: "ASF Alaska", use: "بيانات استشعار عن بعد (طرق، سكك، مناخ)", url: "https://search.asf.alaska.edu/", info: "https://youtu.be/t6cdVbdD8v4?si=j8AmJNBxu7JEH4pF" },
-          { name: "Global Solar Atlas", use: "بيانات الإشعاع الشمسي", url: "https://globalsolaratlas.info/ar/download/gis-files", info: "https://youtu.be/THqgFpaIUsg?si=-M-95nKDSbJD-mFT" },
-          { name: "Earthquake USGS", use: "بيانات الزلازل", url: "https://earthquake.usgs.gov/earthquakes/search", info: "https://youtu.be/kVVAo2MtLuk?si=YJwt7C7fthX-yd8a" },
-          { name: "WorldClim", use: "بيانات مناخية متنوعة", url: "https://www.worldclim.org/data/index.html", info: "https://youtu.be/EncMjy-VC_M?si=Ce4MFDFpTQY_VF1Y" },
-          { name: "GIS4U", use: "بيانات مكانية متنوعة", url: "https://gis-for-you.blogspot.com/2017/01/download-shapfile-soil-map-of-world-125.html", info: "" }
-        ]
-      },
-      {
-        title: "🛰️ أدوات تحميل الصور الجوية",
-        rows: [
-          { name: "Mapp Puzzle", use: "تحميل صور جوية بجودة عالية", url: "https://www.mediafire.com/file/jvmytgitxpaecxn/mappuzzle.rar", info: "https://youtu.be/OKYgCBzEejo?si=o5YdKZ1elV_xVv0k" },
-          { name: "Terra Incognita", use: "تنزيل صور عالية الجودة", url: "http://www.mediafire.com/file/37kmiyiy85nmmtp/InstallTI245.exe/file", info: "https://youtu.be/Z7Iv1lwg9uo?si=Ia4naZcLw1SqoNTc" },
-          { name: "SAS Planet", use: "عرض وتحميل خرائط فضائية بدقة", url: "https://www.mediafire.com/file/mohcbfvt45esyf0/SAS.Planet.Nightly.240828.10624%28sasplanet.geojamal.com%29.zip/file", info: "https://youtu.be/_TigY5FyzxI?si=1Z8A5llx6W1xF5qZ" }
-        ]
-      },
-      {
-        title: "🗺️ برامج نظم المعلومات الجغرافية (GIS)",
-        rows: [
-          { name: "ArcGIS Pro", use: "تحليل بيانات ثلاثية الأبعاد", url: "http://www.mediafire.com/file/cfye8jwwm5mw31a/ArcGIS_Desktop_10.8_By_GeoPoint_IRAQ.rar/file", info: "https://youtu.be/kgV-AENc1hQ?si=6Iuok1C149xDGHRi" },
-          { name: "ArcMap", use: "إنشاء خرائط GIS", url: "http://www.mediafire.com/file/cfye8jwwm5mw31a/ArcGIS_Desktop_10.8_By_GeoPoint_IRAQ.rar/file", info: "https://youtu.be/JfnYHVk9ME8?si=77NPLhaw5ICTudk6" },
-          { name: "Google Earth Pro", use: "استعراض وتحميل KML/KMZ", url: "http://www.mediafire.com/file/of12n1zs9jyycen/Google_Earth_Pro-By_GeoPoint_IRAQ.rar/file", info: "https://youtube.com/playlist?list=PLi5-9SH2ORG33oQuhhG_5A2MRGPBUoXzx&si=LFzyvWJy36mbw4dN" },
-          { name: "Erdas Imagine", use: "تصنيف وتحليل صور فضائية", url: "https://getintopc.com/softwares/development/hexagon-erdas-imagine-foundation-2015-free-download/", info: "https://youtube.com/playlist?list=PLsi1NoZgHLduVpWLpXFvSXjpad9bp0PBR&si=L1X6FaDSfxvZ52aP" },
-          { name: "ENVI", use: "تحليل صور الأقمار الصناعية", url: "https://www.mediafire.com/folder/v44gbj7jtcmjf/envi53", info: "https://youtube.com/playlist?list=PL4U13xnArgP6uCDiyOBq8rFYPBkyVvGyM&si=dhf6N2CpieFuLELK" },
-          { name: "Global Mapper", use: "تحليل بيانات GIS", url: "https://getintopc.com/softwares/navigation/global-mapper-20-free-download/", info: "https://youtu.be/t7M5tZU2Nos?si=mOlJkNydU7gGjahC" },
-          { name: "Surfer", use: "خرائط كنتورية وتحليل جيولوجي", url: "https://www.mediafire.com/folder/v44gbj7jtcmjf/envi53", info: "https://youtube.com/playlist?list=PLi5-9SH2ORG1h5VKfAiukaOn7Y3ic0364&si=xE_Bx16mXcqof2Qk" },
-          { name: "Blender", use: "تحليل ثلاثي الأبعاد", url: "https://www.blender.org/download/", info: "https://youtu.be/0YfyB-Wiuq0?si=OPpjLdevgPO3h9QH" },
-          { name: "QGIS", use: "تحليل مكاني مفتوح المصدر", url: "https://www.qgis.org/en/site/forusers/download.html", info: "https://youtu.be/_sNw9a4eRp4?si=Wu357PgGcgFxDpw-" }
-        ]
-      },
-      {
-        title: "📐 البرامج المساحية",
-        rows: [
-          { name: "AutoCAD 2025", use: "الرسم الإنشائي والمعماري", url: "https://pesktop.com/windows/2025-autodesk-autocad", info: "https://www.youtube.com/playlist?list=PLSTV7GeDHLzjnKtZbvY8hth_QCYg2nzqV" },
-          { name: "Civil 3D 2022", use: "الاعمال المساحية والطرق", url: "https://www.mediafire.com/file/71xjeolo524aw1b/civil+2022.rar/file", info: "https://www.youtube.com/playlist?list=PLSTV7GeDHLzhUIRcCDc9xFKYfv154UQtb" },
-          { name: "Sokkia Link", use: "تحويل بيانات من الأجهزة المساحية", url: "https://www.mediafire.com/file/ryps2mcsql5pc6t/SOKKIA_Link.rar/file", info: "https://www.youtube.com/watch?v=DhL27hVmp9g" },
-          { name: "TPC", use: "معالجة GPS", url: "#", info: "https://youtu.be/1Xw4pqPNOiQ" }
-        ]
-      }
-    ];
-
-    function showSections() {
-      hideAll();
-      const content = document.getElementById("content");
-      content.style.display = "block";
-      data.forEach(sec => {
-        const h2 = document.createElement("h2");
-        h2.textContent = sec.title;
-        const panel = document.createElement("div");
-        panel.className = "panel";
-        const tbl = document.createElement("table");
-        tbl.innerHTML = `
-          <thead>
-            <tr><th>الاسم</th><th>الاستخدام</th><th>${sec.title === "🌍 مواقع تحميل بيانات GIS" ? "فتح" : "تحميل"}</th><th>شرح</th></tr>
-          </thead>
-          <tbody>
-            ${sec.rows.map(r => `
-              <tr>
-                <td>${r.name}</td>
-                <td>${r.use}</td>
-                <td><a href="${r.url}" target="_blank" class="btn download">${sec.title === "🌍 مواقع تحميل بيانات GIS" ? "فتح" : "تحميل"}</a></td>
-                <td><a href="${r.info}" target="_blank" class="btn info">شرح</a></td>
-              </tr>`).join("")}
-          </tbody>`;
-        panel.appendChild(tbl);
-        content.appendChild(h2);
-        content.appendChild(panel);
-      });
-    }
-
-    function showTutorials() {
-      hideAll();
-      const content = document.getElementById("content");
-      content.style.display = "block";
-
-      const h2 = document.createElement("h2");
-      h2.textContent = "📚 شروحات نظم معلومات جغرافية";
-      content.appendChild(h2);
-
-      const panel = document.createElement("div");
-      panel.className = "panel";
-
-      const tbl = document.createElement("table");
-      tbl.innerHTML = `
-        <thead>
-          <tr><th>العنوان</th><th>رابط الشرح</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>شرح 1</td>
-            <td><a href="#" target="_blank" class="btn info">شرح</a></td>
-          </tr>
-          <tr>
-            <td>شرح 2</td>
-            <td><a href="#" target="_blank" class="btn info">شرح</a></td>
-          </tr>
-          <tr>
-            <td>شرح 3</td>
-            <td><a href="#" target="_blank" class="btn info">شرح</a></td>
-          </tr>
-        </tbody>
-      `;
-
-      panel.appendChild(tbl);
-      content.appendChild(panel);
-    }
-
-    function showPdfTutorials() {
-      hideAll();
-      const content = document.getElementById("content");
-      content.style.display = "block";
-
-      const h2 = document.createElement("h2");
-      h2.textContent = "📄 شروحات PDF";
-      content.appendChild(h2);
-
-      const panel = document.createElement("div");
-      panel.className = "panel";
-
-      const p = document.createElement("p");
-      p.textContent = "سيتم إضافة ملفات PDF هنا قريبًا.";
-      panel.appendChild(p);
-
-      content.appendChild(panel);
-    }
-
-    function showGallery() {
-      hideAll();
-      const content = document.getElementById("content");
-      content.style.display = "block";
-
-      const h2 = document.createElement("h2");
-      h2.textContent = "🖼️ معرض خرائط وصور GIS";
-      content.appendChild(h2);
-
-      const panel = document.createElement("div");
-      panel.className = "panel";
-
-      const gallery = document.createElement("div");
-      gallery.className = "gallery-grid";
-
-      const images = [
-        { href: "https://ibb.co/hFGFzgsw", src: "https://i.ibb.co/JjYjJcng/Recovered-png-file-343.png", alt: "خريطة 1" },
-        { href: "https://ibb.co/Gv2kQhPk", src: "https://i.ibb.co/4ZTMRQNM/Recovered-png-file-347.png", alt: "خريطة 2" },
-        { href: "https://ibb.co/3YjZdgQm", src: "https://i.ibb.co/zHBvxqDV/Recovered-png-file-348.png", alt: "خريطة 3" },
-        { href: "https://ibb.co/LD1BNs9s", src: "https://i.ibb.co/ZRxv2bcb/Recovered-png-file-349.png", alt: "خريطة 4" },
-        { href: "https://ibb.co/BHBhDtyh", src: "https://i.ibb.co/9mWxXNbx/Recovered-png-file-357.png", alt: "خريطة 5" },
-        { href: "https://ibb.co/VYWtz5pn", src: "https://i.ibb.co/v4xHTRvy/Recovered-png-file-359.png", alt: "خريطة 6" },
-        { href: "https://ibb.co/Fb7RqdvR", src: "https://i.ibb.co/5WcbxJDb/Recovered-png-file-361.png", alt: "خريطة 7" },
-        { href: "https://ibb.co/6Vyyhpg", src: "https://i.ibb.co/jB88Kxg/Recovered-png-file-377.png", alt: "خريطة 8" },
-        { href: "https://ibb.co/d4XNqLRm", src: "https://i.ibb.co/LdBTWJ3N/image.jpg", alt: "صورة 1" },
-        { href: "https://ibb.co/84dQjyc3", src: "https://i.ibb.co/Z1YbhQms/direction.jpg", alt: "صورة 2" },
-        { href: "https://ibb.co/xtwrHcsC", src: "https://i.ibb.co/kszP1ryH/elevition.jpg", alt: "صورة 3" },
-        { href: "https://ibb.co/Fb5xkDGm", src: "https://i.ibb.co/gMSjbRsm/z.png", alt: "صورة 4" },
-        { href: "https://ibb.co/62FGQ3m", src: "https://i.ibb.co/yDqK2wX/Recovered-jpg-file-102.jpg", alt: "صورة 5" },
-        { href: "https://ibb.co/SXMFxFVd", src: "https://i.ibb.co/5WSb9bsn/Recovered-png-file-338.png", alt: "صورة 6" },
-        { href: "https://ibb.co/zhcCk595", src: "https://i.ibb.co/fYRZcS6S/Export-Graphic.png", alt: "صورة 7" }
-      ];
-
-      images.forEach(imgData => {
-        const a = document.createElement("a");
-        a.href = imgData.href;
-        a.target = "_blank";
-        a.title = imgData.alt;
-        const img = document.createElement("img");
-        img.src = imgData.src;
-        img.alt = imgData.alt;
-        a.appendChild(img);
-        gallery.appendChild(a);
-      });
-
-      panel.appendChild(gallery);
-      content.appendChild(panel);
-    }
-
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const main = document.getElementById("main");
-      sidebar.classList.toggle("hide");
-      main.classList.toggle("full-width");
-      localStorage.setItem("sidebar-hidden", sidebar.classList.contains("hide"));
-    }
-
-    function toggleDarkMode() {
-      const body = document.body;
-      const modeIcon = document.getElementById("modeIcon");
-      body.classList.toggle("dark-mode");
-      const enabled = body.classList.contains("dark-mode");
-      modeIcon.textContent = enabled ? "☀️" : "🌙";
-      localStorage.setItem("dark-mode", enabled ? "enabled" : "disabled");
-    }
-
-    function showPage(id) {
-      hideAll();
-      document.getElementById("page-" + id).style.display = "block";
-    }
-
-    function actionAndHide(fn) {
-      fn();
-      toggleSidebar();
-    }
-
-    function hideAll() {
-      document.getElementById("content").style.display = "none";
-      document.getElementById("content").innerHTML = "";
-      ["page-privacy", "page-contact", "page-about"].forEach(id => {
-        document.getElementById(id).style.display = "none";
-      });
-    }
-
-    let map;
-    function initMap() {
-      map = L.map("map").setView([26.0, 31.5], 5);
-
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution:
-          '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
-      }).addTo(map);
-
-      L.marker([24.7136, 46.6753])
-        .addTo(map)
-        .bindPopup(
-          '<b>Earth Explorer (USGS)</b><br><a href="https://earthexplorer.usgs.gov/" target="_blank">زيارة الموقع</a>'
-        );
-
-      L.marker([30.0444, 31.2357])
-        .addTo(map)
-        .bindPopup(
-          '<b>مواقع تحميل بيانات مصر</b><br><a href="#" target="_blank">اضف روابطك هنا</a>'
-        );
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("dark-mode") === "enabled") toggleDarkMode();
-      if (localStorage.getItem("sidebar-hidden") === "true") {
-        document.getElementById("sidebar").classList.add("hide");
-        document.getElementById("main").classList.add("full-width");
-      }
-      initMap();
-    });
-  </script>
+  <header>
+    <h1>مرحبًا بك في Geonera</h1>
+    <p>منصة ذكية لإدارة وتحليل البيانات الجغرافية</p>
+  </header>  <section class="features">
+    <div class="feature">
+      <h3>تحليل مكاني متقدم</h3>
+      <p>نفّذ تحليلات مكانية دقيقة باستخدام أدوات قوية وسهلة الاستخدام.</p>
+    </div>
+    <div class="feature">
+      <h3>إدارة البيانات الجغرافية</h3>
+      <p>حمّل، عدّل، وتابع بياناتك الجغرافية بسهولة وأمان.</p>
+    </div>
+    <div class="feature">
+      <h3>خرائط تفاعلية</h3>
+      <p>أنشئ خرائط مخصصة وتفاعلية يمكن مشاركتها أو تضمينها.</p>
+    </div>
+  </section>  <div class="cta">
+    <a href="https://mohamed0669.github.io/Geonera.com/">ابدأ الآن</a>
+  </div>  <footer>
+    &copy; 2025 Geonera - جميع الحقوق محفوظة
+  </footer>
 </body>
 </html>
-
