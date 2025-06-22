@@ -15,6 +15,7 @@
      crossorigin="anonymous"></script>
 
   <style>
+    /* أنماط CSS كما هي في كودك الأصلي */
     html, body {
       height: 100%;
       font-size: 14px;
@@ -388,7 +389,7 @@
       <img src="https://i.ibb.co/QFCKwR4x/m.png" alt="شعار جهة أخرى" />
     </header>
 
-    <section id="content" style="display:none;"></section>
+    <section id="content"></section>
 
     <section id="page-privacy" class="panel" style="display:none;" tabindex="0">
       <h2>سياسة الخصوصية</h2>
@@ -401,7 +402,7 @@
         يمكنك التواصل معنا عبر الأرقام التالية:
       </p>
       <ul style="font-size:16px; font-weight:700; list-style:none; padding:0; margin-bottom:20px;">
-        <li>📞 : <span dir="ltr" style="font-family:monospace;">01032042160</span></li>
+        <li>📞 ساناتي: <span dir="ltr" style="font-family:monospace;">01032042160</span></li>
         <li>📞 <span dir="ltr" style="font-family:monospace;">01274053194</span></li>
       </ul>
       <form>
@@ -496,6 +497,33 @@
       hideAll();
       const content = document.getElementById("content");
       content.style.display = "block";
+
+      // إضافة المحتوى الترحيبي مع شرح GIS قبل الجداول
+      const welcome = document.createElement("section");
+      welcome.className = "panel";
+      welcome.setAttribute("tabindex", "0");
+      welcome.innerHTML = `
+        <h2>مرحبًا بك في منصة GeoNera</h2>
+        <p>
+          منصة GeoNera هي منصة عربية متخصصة في نظم المعلومات الجغرافية (GIS)، حيث نوفر لك بيانات مكانية وأدوات تحليلية متقدمة تساعدك في فهم وتحليل العالم من حولك بشكل أفضل.
+        </p>
+        <p>
+          نظم المعلومات الجغرافية (GIS) هي تقنية تُستخدم لجمع وإدارة وتحليل البيانات المكانية وربطها بالمعلومات الوصفية لتقديم خرائط وتقارير دقيقة تساعد في اتخاذ القرارات في مجالات متعددة مثل التخطيط العمراني، البيئة، الزراعة، وإدارة الأزمات.
+        </p>
+        <h3>لماذا نظم المعلومات الجغرافية مهمة؟</h3>
+        <ul>
+          <li>تساعد في تخطيط المشاريع الجديدة والتوسعية بدقة عالية.</li>
+          <li>تمكن من تحليل البيانات المكانية لاتخاذ قرارات مستنيرة.</li>
+          <li>تسهل دمج المعلومات المكانية مع البيانات الوصفية في قاعدة بيانات واحدة.</li>
+          <li>تدعم بناء خرائط تفاعلية تساعد في فهم الظواهر الجغرافية.</li>
+        </ul>
+        <p>
+          في هذه المنصة، ستجد روابط تحميل بيانات GIS، شروحات فيديو، وأدوات تساعدك على استخدام نظم المعلومات الجغرافية بفعالية.
+        </p>
+      `;
+      content.appendChild(welcome);
+
+      // عرض جداول البيانات
       data.forEach(sec => {
         const h2 = document.createElement("h2");
         h2.textContent = sec.title;
@@ -512,7 +540,7 @@
                 <td>${r.name}</td>
                 <td>${r.use}</td>
                 <td><a href="${r.url}" target="_blank" class="btn download">${sec.title === "🌍 مواقع تحميل بيانات GIS" ? "فتح" : "تحميل"}</a></td>
-                <td><a href="${r.info}" target="_blank" class="btn info">شرح</a></td>
+                <td>${r.info ? `<a href="${r.info}" target="_blank" class="btn info">شرح</a>` : ''}</td>
               </tr>`).join("")}
           </tbody>`;
         panel.appendChild(tbl);
@@ -557,7 +585,7 @@
 
       panel.appendChild(tbl);
       content.appendChild(panel);
-      addAd(content); // إضافة الإعلان في نهاية المحتوى
+      addAd(content);
     }
 
     function showPdfTutorials() {
@@ -577,7 +605,7 @@
       panel.appendChild(p);
 
       content.appendChild(panel);
-      addAd(content); // إضافة الإعلان في نهاية المحتوى
+      addAd(content);
     }
 
     function showGallery() {
@@ -627,7 +655,7 @@
 
       panel.appendChild(gallery);
       content.appendChild(panel);
-      addAd(content); // إضافة الإعلان في نهاية المحتوى
+      addAd(content);
     }
 
     function toggleSidebar() {
@@ -651,7 +679,7 @@
       hideAll();
       const page = document.getElementById("page-" + id);
       page.style.display = "block";
-      addAd(page); // إضافة الإعلان داخل القسم المعروض
+      addAd(page);
     }
 
     function actionAndHide(fn) {
@@ -691,6 +719,7 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
+      showSections(); // عرض المحتوى الترحيبي والبيانات تلقائيًا عند تحميل الصفحة
       if (localStorage.getItem("dark-mode") === "enabled") toggleDarkMode();
       if (localStorage.getItem("sidebar-hidden") === "true") {
         document.getElementById("sidebar").classList.add("hide");
@@ -701,4 +730,3 @@
   </script>
 </body>
 </html>
-
